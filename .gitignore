@@ -1,0 +1,5 @@
+/inputfiles/*
+!/inputfiles/sample_input.json
+/outputfiles/*
+!/outputfiles/sample_output.sql
+.env

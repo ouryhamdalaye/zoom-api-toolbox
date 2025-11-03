@@ -1,0 +1,38 @@
+@baseUrl = {{$dotenv BASE_URL}}
+@accountId = {{$dotenv ACCOUNT_ID}}
+@clientId = {{$dotenv CLIENT_ID}}
+@clientSecret = {{$dotenv CLIENT_SECRET}}
+@hostEmail = {{$dotenv HOST_EMAIL}}
+@fromDate = {{$dotenv FROM_DATE}}
+@toDate = {{$dotenv TO_DATE}}
+@zoom_auth_base64 = {{$dotenv ZOOM_AUTH_BASE64}}
+
+
+### OAuth (Server-to-Server) — obtain access token
+# @name oauth
+POST https://zoom.us/oauth/token?grant_type=account_credentials&account_id={{accountId}}
+Authorization: Basic {{zoom_auth_base64}}
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+### Get current Zoom user
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{oauth.response.body.access_token}}
+Accept: application/json
+
+
+### List recordings for a host within date range
+GET {{baseUrl}}/users/{{hostEmail}}/recordings?from={{fromDate}}&to={{toDate}}
+Authorization: Bearer {{oauth.response.body.access_token}}
+Accept: application/json
+
+
+### Get all Zoom users
+GET https://api.zoom.us/v2/users
+Authorization: Bearer {{oauth.response.body.access_token}}
+Accept: application/json
+
+### Get all recordings that contains the word "cst_fr" for a date range (all hosts)
+GET {{baseUrl}}/accounts/{{accountId}}/recordings?from={{fromDate}}&to={{toDate}}&page_size=300
+Authorization: Bearer {{oauth.response.body.access_token}}
+Accept: application/json

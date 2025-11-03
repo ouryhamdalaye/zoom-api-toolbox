@@ -1,0 +1,43 @@
+{
+    "uuid": "xxxx",
+    "id": 1,
+    "account_id": "xxxx",
+    "host_id": "xxxx",
+    "topic": "Some Meeting",
+    "type": 1,
+    "start_time": "2025-10-01T00:00:00Z",
+    "timezone": "Europe/Zurich",
+    "duration": 60,
+    "total_size": 14000,
+    "recording_count": 5,
+    "share_url": "https://us06web.zoom.us/rec/share/xxxxx",
+    "recording_files": [
+      {
+        "id": "xxxxx",
+        "meeting_id": "xxxx",
+        "recording_start": "2025-10-01T00:00:00Z",
+        "recording_end": "2025-10-01T01:00:00Z",
+        "file_type": "MP4",
+        "file_extension": "MP4",
+        "file_size": 30000,
+        "play_url": "https://us06web.zoom.us/rec/play/xxxx",
+        "download_url": "https://us06web.zoom.us/rec/download/xxxxx",
+        "status": "completed",
+        "recording_type": "shared_screen_with_speaker_view"
+      },
+      {
+        "id": "xxxxx",
+        "meeting_id": "xxxx",
+        "recording_start": "2025-10-01T00:00:00Z",
+        "recording_end": "2025-10-01T01:00:00Z",
+        "file_type": "CHAT",
+        "file_extension": "TXT",
+        "file_size": 30,
+        "play_url": "https://us06web.zoom.us/rec/play/xxxx",
+        "download_url": "https://us06web.zoom.us/rec/download/xxxxx",
+        "status": "completed",
+        "recording_type": "chat_file"
+      } //....
+    ],
+    "recording_play_passcode": ""
+}

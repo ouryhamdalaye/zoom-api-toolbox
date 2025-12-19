@@ -1,0 +1,17 @@
+{
+  "name": "api-zoom",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Zoom API integration tools",
+  "scripts": {
+    "test-connection": "node test-zoom-connection.js",
+    "get-recordings": "node get-zoom-recordings.js",
+    "delete-audio": "node delete-audio-only-recordings.js",
+    "delete-audio:help": "node delete-audio-only-recordings.js --help"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
+  }
+}
+

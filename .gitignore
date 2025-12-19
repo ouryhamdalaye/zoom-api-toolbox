@@ -3,3 +3,4 @@
 /outputfiles/*
 !/outputfiles/sample_output.sql
 .env
+/node_modules

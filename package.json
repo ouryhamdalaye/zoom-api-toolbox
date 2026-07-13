@@ -7,7 +7,8 @@
     "test-connection": "node test-zoom-connection.js",
     "get-recordings": "node get-zoom-recordings.js",
     "delete-audio": "node delete-audio-only-recordings.js",
-    "delete-audio:help": "node delete-audio-only-recordings.js --help"
+    "delete-audio:help": "node delete-audio-only-recordings.js --help",
+    "export-links": "node export-links.js"
   },
   "dependencies": {
     "axios": "^1.6.0",

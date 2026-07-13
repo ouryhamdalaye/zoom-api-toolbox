@@ -7,6 +7,7 @@ A tool for interacting with the Zoom API to retrieve meeting recordings and gene
 - 🔐 **OAuth Authentication** - Server-to-Server OAuth integration with Zoom
 - 📹 **Recording Retrieval** - Fetch Zoom meeting recordings by host or account
 - 🔄 **SQL Generation** - Convert Zoom recording JSON data to SQL INSERT statements for Moodle
+- 📎 **Link Export** - Export meeting share links to CSV from the Zoom API
 - 🌍 **Environment Variables** - Secure credential management using `.env` files
 
 ## Prerequisites
@@ -61,6 +62,68 @@ Open `requests.http` in VS Code. The file contains pre-configured API requests:
 5. **Get All Recordings** - Retrieves all recordings for the account within a date range
 
 Click the "Send Request" button above each request to execute it. The OAuth token response will be automatically used in subsequent requests.
+
+### Exporting Meeting Share Links to CSV
+
+The `export-links.js` script authenticates with Zoom, fetches cloud recordings for a given host, and writes a simple CSV with meeting name, date, and public share link.
+
+#### Usage
+
+```bash
+npm run export-links -- <hostEmail> [--from YYYY-MM-DD] [--to YYYY-MM-DD]
+```
+
+Or directly:
+
+```bash
+node export-links.js <hostEmail> [--from YYYY-MM-DD] [--to YYYY-MM-DD]
+```
+
+#### Parameters
+
+- `<hostEmail>` — Zoom host email (required)
+- `--from`, `-f` — Start date in `YYYY-MM-DD` format (optional, defaults to today)
+- `--to`, `-t` — End date in `YYYY-MM-DD` format (optional, defaults to today)
+
+If neither `--from` nor `--to` is provided, the script exports **all** recordings from `2011-01-01` through today.
+
+#### Examples
+
+```bash
+# Export all recordings for a host
+node export-links.js host@example.com
+
+# Export from a specific date through today
+node export-links.js host@example.com --from 2024-01-01
+
+# Export a specific date range
+node export-links.js host@example.com --from 2024-01-01 --to 2024-12-31
+```
+
+OAuth credentials (`BASE_URL`, `ACCOUNT_ID`, `ZOOM_AUTH_BASE64`) are still read from `.env`.
+
+#### Behavior
+
+1. Obtains an OAuth access token via Server-to-Server auth (`ZOOM_AUTH_BASE64`)
+2. Calls `GET /v2/users/{hostEmail}/recordings` with `from` and `to` query parameters
+3. Splits the date range into 1-month chunks when needed (Zoom API limit)
+4. Paginates results with `page_size=300` and `next_page_token`
+5. Extracts `topic`, `start_time`, and `share_url` from each meeting (ignores `recording_files`)
+6. Writes `outputfiles/zoom_links_{hostEmail}.csv`
+
+#### Output CSV Format
+
+```csv
+topic,start_time,share_url
+Weekly Team Sync,2025-01-15T10:00:00Z,https://zoom.us/rec/share/...
+```
+
+#### Error Handling
+
+- Missing or invalid `.env` variables exit with a clear message
+- OAuth failures (invalid token/credentials) are reported with troubleshooting hints
+- HTTP 429 rate limits trigger automatic retries with backoff
+- If no recordings are found, an empty CSV with headers is still written and a warning is displayed
 
 ### Generating SQL from Zoom Recording Data
 
@@ -167,6 +230,7 @@ API-Zoom/
 ├── .env                      # Environment variables (gitignored)
 ├── .gitignore               # Git ignore rules
 ├── generate-sql.js          # Node.js script to convert JSON to SQL
+├── export-links.js          # Node.js script to export meeting share links to CSV
 ├── requests.http            # REST Client HTTP requests for Zoom API
 ├── inputfiles/              # Input JSON files (gitignored, except sample_input.json)
 │   └── sample_input.json    # Example input file (tracked in git)

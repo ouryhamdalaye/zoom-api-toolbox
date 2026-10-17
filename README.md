@@ -125,6 +125,33 @@ Weekly Team Sync,2025-01-15T10:00:00Z,https://zoom.us/rec/share/...
 - HTTP 429 rate limits trigger automatic retries with backoff
 - If no recordings are found, an empty CSV with headers is still written and a warning is displayed
 
+### Auditing Focus Mode / Prevent Screen Capture
+
+The `audit-meeting-security.js` script lists, for every active licensed user (type 2), the meetings that **start** within a period and reports whether `settings.focus_mode` and `settings.prevent_screen_capture` are enabled.
+
+#### Usage
+
+```bash
+npm run audit-security -- [--from YYYY-MM-DD] [--to YYYY-MM-DD] [--tz Europe/Zurich] [--emails a@x.ch,b@x.ch]
+```
+
+- `--from`, `-f` — period start, inclusive (default `2026-10-06`), midnight in `--tz` (default `Europe/Zurich`)
+- `--to`, `-t` — period end, inclusive (default: no end, upcoming meetings included)
+- `--emails`, `-e` — restrict to these hosts (comma-separated)
+
+#### Behavior
+
+1. `GET /v2/users?status=active`, keeps `type === 2`
+2. `GET /v2/users/{userId}/meetings` with `type=scheduled` and `type=previous_meetings`, deduplicated by meeting id
+3. Single meetings: kept when `start_time` falls in the period, then `GET /v2/meetings/{meetingId}`
+4. Recurring meetings with a fixed time: `GET /v2/meetings/{meetingId}` with and without `show_previous_occurrences=true`; kept when at least one non-deleted occurrence starts in the period
+5. Recurring meetings with no fixed time have no start date: listed in the console as ignored
+6. Writes `outputfiles/audit_securite_reunions_depuis_{from}.csv` (or `_{from}_au_{to}.csv`) and prints a per-host summary
+
+The CSV gives the first session in the period (local time) and the number of sessions in the period. Values are `OUI`, `NON`, or `non renvoyé` (Zoom omitted the field; the account default applies). `focus_mode` and `prevent_screen_capture` are not returned by the list endpoint, hence the per-meeting call. Meetings deleted before the audit cannot be listed.
+
+Required scopes: `user:read:list_users:admin`, `meeting:read:list_meetings:admin`, `meeting:read:meeting:admin`.
+
 ### Generating SQL from Zoom Recording Data
 
 The `generate-sql.js` script converts Zoom recording JSON files into SQL INSERT statements for Moodle's `prefix_zoom_meeting_recordings` table.
